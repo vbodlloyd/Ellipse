@@ -88,8 +88,8 @@ public class DrawingPanel extends SurfaceView {
 			y=quarterHeight;
 			
 		}
-		if(jump){
-			count = 5; jump = !jump;}
+		if(jump && count == -7){
+			count = 5;}
 		if(angle>= 360){
 			angle-=360;
 		}
@@ -118,7 +118,8 @@ public class DrawingPanel extends SurfaceView {
 			y = (int) (quarterHeight-margingUpDown+ (quarterHeight -margingSide-sizeHero)*Math.sin(angle));
 			angle+=speed*Math.PI/128;
 		}
-		
+		if (jump && count ==-7)		{
+		jump = ! jump}
 		canvas.drawColor(Color.BLACK);
 		paint.setColor(Color.BLUE);
 		paint.setStyle(Paint.Style.STROKE);
