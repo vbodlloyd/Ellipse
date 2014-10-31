@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -27,7 +28,12 @@ public class DrawingPanel extends SurfaceView {
 	private int sizeHero = 20;
 	private float speed = 2;
 	private boolean jump = false;
-	private int count=-7;
+	private int count=-10;
+	private int sizeJump=10;
+	private MovingObject hero;
+	private MovingObject hero2;
+	
+	
 
 	public DrawingPanel(Context context) {
 		super(context);
@@ -77,49 +83,49 @@ public class DrawingPanel extends SurfaceView {
 
 	@Override
 	public void onDraw(Canvas canvas) {
-		if(x == 0 && y ==0){
+		if(x == 0){
+			x =1;
 			height = getHeight();
 			width = getWidth();
 			quarterHeight = height/4;
 			threeQuarterHeight = height-height/4;
 			halfHeight = height/2;
 			halfWidth = width/2;
-			x=margingSide+sizeHero;
-			y=quarterHeight;
+			hero = new MovingObject(height,width,margingSide+sizeHero,quarterHeight,margingSide,sizeHero,margingUpDown,0);
+			hero2 = new MovingObject(height,width,width-margingSide-sizeHero,threeQuarterHeight,margingSide,sizeHero,margingUpDown,1);
 			
 		}
-		if(jump && count == -7){
-			count = 5;}
-		if(angle>= 360){
-			angle-=360;
-		}
-		if (x >= margingSide+sizeHero && x <=margingSide+sizeHero+60 && y >=quarterHeight && y<=threeQuarterHeight) {
-			y += speed*5;
-			if( count >= 0){
-				x+=10;count--;}
-			if( count < 0 && count > -7){
-				x-=10;count--;}
-		}
+		
+		jump = hero.move(jump,100,speed,sizeJump);
+		hero2.move(jump,100,speed,sizeJump);
+		
+		drawBackground(canvas);
+		
+		drawNumber(canvas);
 
-		if (x >= width-margingSide-sizeHero-60 && x <= width-margingSide-sizeHero && y >=quarterHeight && y<=threeQuarterHeight) {
-			y -= speed*5;
-			if( count >= 0){
-				x-=10;count--;}
-			if( count < 0 && count > -7){
-				x+=10;count--;}
-		}
-		if (y>=threeQuarterHeight) {
-			x = (int) (halfWidth- (halfWidth -margingSide-sizeHero)*Math.cos(angle));
-			y = (int) (threeQuarterHeight-margingUpDown+ (quarterHeight -margingSide-sizeHero)*Math.sin(angle));
-			angle+=speed*Math.PI/128;
-		}
-		if (y<=quarterHeight) {
-			x = (int) (halfWidth- (halfWidth -margingSide-sizeHero)*Math.cos(angle));
-			y = (int) (quarterHeight-margingUpDown+ (quarterHeight -margingSide-sizeHero)*Math.sin(angle));
-			angle+=speed*Math.PI/128;
-		}
-		if (jump && count ==-7)		{
-		jump = ! jump}
+		paint.setColor(Color.BLUE);
+		paint.setStyle(Paint.Style.STROKE);
+		canvas.drawRect(width - 40, halfHeight, width - 10, halfHeight - 10, paint);
+		
+		canvas.drawRect(10, halfHeight+20,40, halfHeight+10, paint);
+		
+		paint.setColor(Color.WHITE);
+		canvas.drawCircle(hero.getX(),hero.getY(),sizeHero,paint);
+		canvas.drawCircle(hero2.getX(),hero2.getY(),sizeHero,paint);
+		
+//		if(x+sizeHero >= width-40 &&( y-sizeHero<=halfHeight && y-sizeHero>=halfHeight -10 || y+sizeHero<=halfHeight && y+sizeHero>=halfHeight -10)) {
+//			
+//		}
+	}
+
+	private void drawNumber(Canvas canvas) {
+		paint.setStyle(Paint.Style.FILL);
+		paint.setColor(Color.YELLOW);
+		paint.setTextSize(width/2);
+		canvas.drawText("1", width/2-width/8, height/2+height/8, paint);
+	}
+
+	private void drawBackground(Canvas canvas) {
 		canvas.drawColor(Color.BLACK);
 		paint.setColor(Color.BLUE);
 		paint.setStyle(Paint.Style.STROKE);
@@ -128,9 +134,6 @@ public class DrawingPanel extends SurfaceView {
 		canvas.drawLine(width-margingSide, quarterHeight, width-margingSide, threeQuarterHeight, paint);
 		canvas.drawArc(new RectF(margingSide, halfHeight, width-margingSide, height-margingUpDown), -180, -180,false,paint);
 		canvas.drawArc(new RectF(margingSide, margingUpDown, width-margingSide, halfHeight), 180, 180,false,paint);
-		
-		paint.setColor(Color.WHITE);
-		canvas.drawCircle(x,y,sizeHero,paint);
 	}
 
 }
