@@ -4,8 +4,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Typeface;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -28,24 +29,36 @@ public class DrawingPanel extends SurfaceView {
 	private int sizeHero = 20;
 	private float speed = 2;
 	private boolean jump = false;
+	private boolean jump2 = false;
 	private int count=-10;
 	private int sizeJump=10;
 	private MovingObject hero;
 	private MovingObject hero2;
+	private Rect rect1;
+	private Rect rect2;
 	
 	
 
 	public DrawingPanel(Context context) {
 		super(context);
 		gameLoopThread = new PanelThread(this);
-		setOnClickListener(new OnClickListener() {
-			
+
+		setOnTouchListener(new OnTouchListener() {
+
+
 			@Override
-			public void onClick(View v) {
+			public boolean onTouch(View v, MotionEvent event) {
+				if(event.getY() >= threeQuarterHeight){
 				if(jump)
-					return;
-				jump = !jump;
-				
+					return true;
+				return jump = !jump;
+				}
+				else if(event.getY() <= quarterHeight){
+					if(jump2)
+						return true;
+					return jump2 = !jump2;
+				}
+				return true;
 			}
 		});
 		holder = getHolder();
@@ -93,11 +106,12 @@ public class DrawingPanel extends SurfaceView {
 			halfWidth = width/2;
 			hero = new MovingObject(height,width,margingSide+sizeHero,quarterHeight,margingSide,sizeHero,margingUpDown,0);
 			hero2 = new MovingObject(height,width,width-margingSide-sizeHero,threeQuarterHeight,margingSide,sizeHero,margingUpDown,1);
-			
+			rect1 = new Rect(width - 40, halfHeight, width - 10, halfHeight - 10);
+			rect2 = new Rect(10, halfHeight+20,40, halfHeight+10);
 		}
 		
 		jump = hero.move(jump,100,speed,sizeJump);
-		hero2.move(jump,100,speed,sizeJump);
+		jump2 = hero2.move(jump2,100,speed,sizeJump);
 		
 		drawBackground(canvas);
 		
@@ -105,9 +119,9 @@ public class DrawingPanel extends SurfaceView {
 
 		paint.setColor(Color.BLUE);
 		paint.setStyle(Paint.Style.STROKE);
-		canvas.drawRect(width - 40, halfHeight, width - 10, halfHeight - 10, paint);
-		
-		canvas.drawRect(10, halfHeight+20,40, halfHeight+10, paint);
+
+		canvas.drawRect(rect1, paint);
+		canvas.drawRect(rect2, paint);
 		
 		paint.setColor(Color.WHITE);
 		canvas.drawCircle(hero.getX(),hero.getY(),sizeHero,paint);
